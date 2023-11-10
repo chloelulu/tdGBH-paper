@@ -29,11 +29,38 @@ dat <- list(pValues = pValues, pvals = pvals, covariate =covariate)
 save(dat, file = '/home/mayo/m216453/lu/pairwiseFDR/data/realdata/noshuffle/dat/P.combo.ZicoSeq.RData')
 
 # FDR adjustment
+load('/home/mayo/m216453/lu/pairwiseFDR/data/realdata/noshuffle/dat/P.combo.ZicoSeq.RData')
 source('/research/bsi/projects/staff_analysis/m216453/pairwiseFDR/code/func.R')
-methods_funs <- list('AdaptiveGBHo'='run_AdaptiveGBHo','AdaptiveGBHg'='run_AdaptiveGBHg',
-                     'BH'='run_BH','ST' = 'run_ST', 'StoreyNew1'='Storey_New_0.1',
-                     'stratBHo'='run_stratBHo','stratSTo'='run_stratSTo','stratBHg'='run_stratBHg','stratSTg'='run_stratSTg')
-for(m in c('stratBHg','stratSTg','BH','ST','stratBHo','stratSTo','AdaptiveGBHo','AdaptiveGBHg','StoreyNew1')){
+methods_funs <- list('AdaptiveGBHo'='run_AdaptiveGBHo',
+                     'AdaptiveGBHg'='run_AdaptiveGBHg',
+                     'AdaptiveGBHo_storey'='run_AdaptiveGBHo_st',
+                     'AdaptiveGBHg_storey'='run_AdaptiveGBHg_st',
+                     'BH'='run_BH',
+                     'ST'='run_ST',
+                     'stratBHo'='run_stratBHo',
+                     'stratSTo'='run_stratSTo',
+                     'stratBHg'='run_stratBHg',
+                     'stratSTg'='run_stratSTg',
+                     'StoreyNew0'='Storey_New_0',
+                     'StoreyNew05'='Storey_New_0.05',
+                     'StoreyNew1'='Storey_New_0.1',
+                     'StoreyNew2'='Storey_New_0.2',
+                     'StoreyNew4'='Storey_New_0.4',
+                     'StoreyGeo1'='Storey_Geo_0.1',
+                     'StoreyAri1'='Storey_Ari_0.1',
+                     'StoreyNew1N'='Storey_New_0.1_norm',
+                     'StoreyNew1S'='Storey_New_0.1_S',
+                     'tdgbh3F'='run_tdgbh3F',
+                     'tdgbh3T'='run_tdgbh3T',
+                     'swfdrBH'='run_swfdr.BH',
+                     'swfdr'='run_swfdr',
+                     'CAMT'='run_CAMT',
+                     'FDRregT'='run_FDRregT',
+                     'FDRregE'='run_FDRregE',
+                     'adaptMT'='run_adaptMT')
+# tdgbh3F tdgbh3T swfdr CAMT FDRregT FDRregE adaptMT
+for(m in c('tdgbh3F','tdgbh3T','swfdr','CAMT','FDRregT','FDRregE','adaptMT')){
+  # for(m in c('stratBHg','stratSTg','BH','ST','stratBHo','stratSTo','AdaptiveGBHo','AdaptiveGBHg','StoreyNew1','AdaptiveGBHo_storey','AdaptiveGBHg_storey')){
   cat(m,'\n')
   tryCatch({
     res <- time <- NULL
@@ -70,9 +97,11 @@ covariate <- P.df[,c(1,2),drop =F];colnames(covariate) <- c('gene','outcome')
 covariate$gene <- as.factor(covariate$gene)
 covariate$outcome <- as.factor(covariate$outcome)
 dat <- list(pValues = pValues, pvals = pvals, covariate =covariate)
-save(dat, file = paste0("/home/mayo/m216453/lu/pairwiseFDR/data/realdata/shuffle/dat/P.adenoma.ZicoSeq.RData"))
+save(dat, file = paste0("/home/mayo/m216453/lu/pairwiseFDR/data/realdata/noshuffle/dat/P.adenoma.ZicoSeq.RData"))
+
 # FDR adjustment
-for(m in c('stratBHg','stratSTg','BH','ST','stratBHo','stratSTo','AdaptiveGBHo','AdaptiveGBHg','StoreyNew1')){
+load("/home/mayo/m216453/lu/pairwiseFDR/data/realdata/noshuffle/dat/P.adenoma.ZicoSeq.RData")
+for(m in c('tdgbh3F','tdgbh3T','swfdr','CAMT','FDRregT','FDRregE','adaptMT')){#,'stratBHg','stratSTg','BH','ST','stratBHo','stratSTo','AdaptiveGBHo','AdaptiveGBHg','StoreyNew1','AdaptiveGBHo_storey','AdaptiveGBHg_storey'
   cat(m,'\n')
   tryCatch({
     res <- time <- NULL
@@ -82,6 +111,7 @@ for(m in c('stratBHg','stratSTg','BH','ST','stratBHo','stratSTo','AdaptiveGBHo',
     save(out, res, file = paste0('/home/mayo/m216453/lu/pairwiseFDR/data/realdata/noshuffle/res/P.adenoma.ZicoSeq_',m,'.Rdata'))
   })
 }
+
 ## ---- autism (submit to cluster by calculateP_noshuffle.sh)----
 args=(commandArgs(TRUE))
 if(length(args)==0){
@@ -181,7 +211,7 @@ save(p,ident, file = paste0(folder,"/P.",gsub('.RData','',file),'_',k,".Wilcox.R
 
 
 ## convert independent p to dat for later FDR fit
-files <- list.files('/home/mayo/m216453/lu/pairwiseFDR/data/realdata/noshuffle/P/', pattern = '^P')
+files <- list.files('/home/mayo/m216453/lu/pairwiseFDR/data/realdata/noshuffle/P/Autism/', pattern = '^P')
 for(f in files){
   cat(f,'\n')
   p <- NULL
@@ -208,8 +238,8 @@ for(f in files){
   }
 }
 
-files <- list.files('/home/mayo/m216453/lu/pairwiseFDR/data/realdata/noshuffle/P/', pattern = '^P')
-setwd('/home/mayo/m216453/lu/pairwiseFDR/data/realdata/noshuffle/P/')
+files <- list.files('/home/mayo/m216453/lu/pairwiseFDR/data/realdata/noshuffle/P/Autism/', pattern = '^P')
+setwd('/home/mayo/m216453/lu/pairwiseFDR/data/realdata/noshuffle/P/Autism/')
 P <- list()
 for(file in files){
   p <- ident <- NULL
@@ -237,10 +267,6 @@ save(dat, file = paste0('/home/mayo/m216453/lu/pairwiseFDR/data/realdata/noshuff
 
 
 
-
-
-
-
 ## fit FDR adjust methods together with run_real_noshuffle.sh 
 args=(commandArgs(TRUE))
 if(length(args)==0){
@@ -251,9 +277,33 @@ if(length(args)==0){
 }
 source('/research/bsi/projects/staff_analysis/m216453/pairwiseFDR/code/func.R')
 load(paste0('/home/mayo/m216453/lu/pairwiseFDR/data/realdata/noshuffle/dat/',f))
-methods_funs <- list('AdaptiveGBHo'='run_AdaptiveGBHo','AdaptiveGBHg'='run_AdaptiveGBHg',
-                     'BH'='run_BH','ST' = 'run_ST', 'StoreyNew1'='Storey_New_0.1',
-                     'stratBHo'='run_stratBHo','stratSTo'='run_stratSTo','stratBHg'='run_stratBHg','stratSTg'='run_stratSTg')
+methods_funs <- list('AdaptiveGBHo'='run_AdaptiveGBHo',
+                     'AdaptiveGBHg'='run_AdaptiveGBHg',
+                     'AdaptiveGBHo_storey'='run_AdaptiveGBHo_st',
+                     'AdaptiveGBHg_storey'='run_AdaptiveGBHg_st',
+                     'BH'='run_BH',
+                     'ST'='run_ST',
+                     'stratBHo'='run_stratBHo',
+                     'stratSTo'='run_stratSTo',
+                     'stratBHg'='run_stratBHg',
+                     'stratSTg'='run_stratSTg',
+                     'StoreyNew0'='Storey_New_0',
+                     'StoreyNew05'='Storey_New_0.05',
+                     'StoreyNew1'='Storey_New_0.1',
+                     'StoreyNew2'='Storey_New_0.2',
+                     'StoreyNew4'='Storey_New_0.4',
+                     'StoreyGeo1'='Storey_Geo_0.1',
+                     'StoreyAri1'='Storey_Ari_0.1',
+                     'StoreyNew1N'='Storey_New_0.1_norm',
+                     'StoreyNew1S'='Storey_New_0.1_S',
+                     'tdgbh3F'='run_tdgbh3F',
+                     'tdgbh3T'='run_tdgbh3T',
+                     'swfdrBH'='run_swfdr.BH',
+                     'swfdr'='run_swfdr',
+                     'CAMT'='run_CAMT',
+                     'FDRregT'='run_FDRregT',
+                     'FDRregE'='run_FDRregE',
+                     'adaptMT'='run_adaptMT')
 tryCatch({
   res <- time <- NULL
   wrapper <- match.fun(methods_funs[[m]])
@@ -264,19 +314,32 @@ tryCatch({
 
 
 ## ==== TPR plot code ======
-library(ComplexHeatmap);library(ggplot2);library(dplyr);library(tidyr);library(reshape2);library(tibble);library(RColorBrewer)
+library(ComplexHeatmap,lib.loc = '/usr/local/biotools/rpackages/R-4.2.2-2023-02-01')
+library(ggplot2);library(dplyr);library(tidyr);library(reshape2);library(tibble);library(RColorBrewer)
 setwd('/home/mayo/m216453/lu/pairwiseFDR/data/realdata/noshuffle/res/')
-col <- c('2dGBH'="#EF3B2C","ST"="#C6DBEF","BH"="#6BAED6", 
-         "stratBH_o"=brewer.pal(8,'Greens')[3], "stratST_o"="#41AB5D",
+col <- c('2dGBH-geo'="#FCBBA1",'2dGBH-ari'="forestgreen",'2dGBH'="#EF3B2C",'lslStoreyNew1'='green','tstStoreyNew1'='blue','lsl_New1'='yellow',
+         '2dGBH-norm'="#EFEDF5",'2dGBH-P'="#B3DE69",
+         '2dGBH-0'="#FFF5EB",'2dGBH-0.05'="#FEE6CE",'2dGBH-0.1'="#EF3B2C",
+         '2dGBH-0.2'="#FDAE6B", '2dGBH-0.4'="#F16913", 
+         "ST"="#C6DBEF","BH"="#6BAED6", 
+         "stratBH_o"="#C7E9C0", "stratST_o"="#41AB5D",
          "stratBH_g"="#238443", "stratST_g"="#F7FCB9",
-         "AdaptiveGBH_o"="#6A51A3", "AdaptiveGBH_g"="#9E9AC8")
+         "AdaptiveGBH_o"="#6A51A3", "AdaptiveGBH_g"="#9E9AC8",
+         'NSC_1'="#E6AB02", 'NSC_2'="#A6761D", 
+         'swfdr'="#B3E2CD", 'swfdrBH'="#FDCDAC", 'CAMT'="#DECBE4", 
+         'FDRregT'="#969696", 'FDRregE'="#525252", 'adaptMT'="#FBB4AE")
 setwd('/home/mayo/m216453/lu/pairwiseFDR/data/realdata/noshuffle/res/')
 line.p <- list()
 for(pt in c('combo','adenoma','Autism')){
   files <- list.files(pattern = pt)
+  files <- files[!(files %in% c("P.combo.ZicoSeq_AdaptiveGBHg.Rdata","P.combo.ZicoSeq_AdaptiveGBHo.Rdata",
+                                "P.adenoma.ZicoSeq_AdaptiveGBHg.Rdata","P.adenoma.ZicoSeq_AdaptiveGBHo.Rdata"))]
   if(pt =='Autism'){
-    files <- files[-grep('Autism.ZicoSeq',files)]
+    files <- c("Autism_AdaptiveGBHg_storey.Rdata","Autism_AdaptiveGBHo_storey.Rdata",
+               "Autism_BH.Rdata", "Autism_ST.Rdata","Autism_StoreyNew1.Rdata",
+               "Autism_stratBHo.Rdata","Autism_stratSTo.Rdata")
   }
+  
   P <- c()
   for(file in files){
     cat(file,': ')
@@ -288,21 +351,23 @@ for(pt in c('combo','adenoma','Autism')){
     P <- cbind(P, p)
   }
   rownames(P) <- paste0('g',1:nrow(P))
-  colnames(P) <- gsub('Autism_|.Rdata|P.combo.ZicoSeq_|P.adenoma.ZicoSeq_|Autism.ZicoSeq_','',files)
+  colnames(P) <- gsub('Autism_|.Rdata|P.combo.ZicoSeq_|P.adenoma.ZicoSeq_|Autism.ZicoSeq_|P.adenoma.ZicoSeq_','',files)
   colnames(P)[colnames(P)=='StoreyGeo1'] <- '2dGBH-geo'
   colnames(P)[colnames(P)=='StoreyNew1'] <- '2dGBH'
   colnames(P)[colnames(P)=='stratBHo'] <- 'stratBH_o'
   colnames(P)[colnames(P)=='stratBHg'] <- 'stratBH_g'
   colnames(P)[colnames(P)=='stratSTo'] <- 'stratST_o'
   colnames(P)[colnames(P)=='stratSTg'] <- 'stratST_g'
-  colnames(P)[colnames(P)=='AdaptiveGBHo'] <- 'AdaptiveGBH_o'
-  colnames(P)[colnames(P)=='AdaptiveGBHg'] <- 'AdaptiveGBH_g'
-  P <- P[,c('AdaptiveGBH_g','AdaptiveGBH_o',"BH", "ST","2dGBH","stratBH_o","stratST_o")]
+  colnames(P)[colnames(P)=='AdaptiveGBHo_storey'] <- 'AdaptiveGBH_o'
+  colnames(P)[colnames(P)=='AdaptiveGBHg_storey'] <- 'AdaptiveGBH_g'
+  # colnames(P)[colnames(P)=='AdaptiveGBHo'] <- 'AdaptiveGBH_o'
+  # colnames(P)[colnames(P)=='AdaptiveGBHg'] <- 'AdaptiveGBH_g'
+  P <- P[, c("BH","ST","2dGBH","AdaptiveGBH_g","AdaptiveGBH_o","stratBH_o","stratST_o" )]
   sort(colSums(P<0.2, na.rm = T))
   sort(colSums(P<0.15, na.rm = T))
   sort(colSums(P<0.1, na.rm = T))
   sort(colSums(P<0.05, na.rm = T))
-  df <- melt(cbind.data.frame(`20%`=colSums(P<0.2, na.rm = T), `15%`=colSums(P<0.15, na.rm = T), `10%`=colSums(P<0.1, na.rm = T),`5%`=colSums(P<0.05, na.rm = T)) %>% rownames_to_column('method'))
+  df <- reshape2::melt(cbind.data.frame(`20%`=colSums(P<0.2, na.rm = T), `15%`=colSums(P<0.15, na.rm = T), `10%`=colSums(P<0.1, na.rm = T),`5%`=colSums(P<0.05, na.rm = T)) %>% rownames_to_column('method'))
   df <- within(df, variable <- factor(variable, levels = c('5%','10%','15%','20%')))
   df <- within(df, method <- factor(method, levels = c("BH","ST","2dGBH","AdaptiveGBH_g","AdaptiveGBH_o","stratBH_o","stratST_o" )))
   line.p[[pt]] <- ggplot(df, aes(x = variable, y = value)) + 
@@ -316,9 +381,9 @@ for(pt in c('combo','adenoma','Autism')){
           legend.text = element_text(color = 'black', size = 14),
           panel.grid = element_blank()) + 
     scale_color_manual(values = col) + 
-    labs(color = '', x='FDR', y = '# of positive findings')
-  # ggsave(paste0('/research/bsi/projects/staff_analysis/m216453/pairwiseFDR/result/(Figure4C)',pt,'_TPR_line.pdf'), width = 6, height = 5)
-
+    labs(color = '', x='FDR', y = '# of findings')
+  # ggsave(paste0('/research/bsi/projects/staff_analysis/m216453/pairwiseFDR/result/(Figure4C)',pt,'_TPR_line_rev.pdf'), width = 6, height = 5)
+  
   res00 <- P
   res00[is.na(res00)] <- 1
   sum(apply(res00, 1, function(x) sum(x<=0.05)) >0)/nrow(res00)
@@ -329,7 +394,7 @@ for(pt in c('combo','adenoma','Autism')){
   res00.lt.1 <- apply(res00, 2, function(x) names(x[x<=0.1]))
   res00.lt.15 <- apply(res00, 2, function(x) names(x[x<=0.15]))
   res00.lt.2 <- apply(res00, 2, function(x) names(x[x<=0.2]))
-  pdf(paste0('/research/bsi/projects/staff_analysis/m216453/pairwiseFDR/result/(Figure4D)',pt,'_UpSetPlot.pdf'), width = 6, height = 5)
+  pdf(paste0('/research/bsi/projects/staff_analysis/m216453/pairwiseFDR/result/(Figure4D)',pt,'_UpSetPlot_rev.pdf'), width = 6, height = 5)
   res00.lt.2.m1 = make_comb_mat(res00.lt.05)
   UpSet(res00.lt.2.m1)
 
@@ -343,9 +408,9 @@ for(pt in c('combo','adenoma','Autism')){
   UpSet(res00.lt.2.m4)
   dev.off()
 }
-
+library(ggpubr)
 ggarrange(line.p$combo, line.p$adenoma, line.p$Autism, nrow = 1, common.legend = T)
-ggsave(paste0('/research/bsi/projects/staff_analysis/m216453/pairwiseFDR/result/(Figure4C)TPR_line.pdf'), width = 10, height = 5)
+ggsave(paste0('/research/bsi/projects/staff_analysis/m216453/pairwiseFDR/result/(Figure4C)TPR_line_rev.pdf'), width = 10, height = 5)
 
 
 ## ==== FDR analysis code ======
@@ -498,9 +563,20 @@ for(iter in 1:100){
   covariate$gene <- as.factor(covariate$gene)
   covariate$outcome <- as.factor(covariate$outcome)
   dat <- list(pValues = pValues, pvals = pvals, covariate =covariate)
-  save(dat, file = paste0('/home/mayo/m216453/lu/pairwiseFDR/data/realdata/shuffle/dat/Autism0/P.Autism_',iter,'.wilcox.RData'))
+  save(dat, file = paste0('/home/mayo/m216453/lu/pairwiseFDR/data/realdata/shuffle/dat/P.Autism_',iter,'.wilcox.RData'))
   cat('\n')
 }
+
+
+# setwd('/home/mayo/m216453/lu/pairwiseFDR/data/realdata/shuffle/dat/')
+# files <- list.files(pattern = 'wilcox.RData')
+# n <- c()
+# for(file in files){
+#   load(file)
+#   n <- c(n, mean(dat$pValues<0.05, na.rm = T))
+# }
+# summary(n)
+
 
 
 ## calculate FDR (with run_real_shuffle.sh)
@@ -513,10 +589,32 @@ if(length(args)==0){
 }
 source('/research/bsi/projects/staff_analysis/m216453/pairwiseFDR/code/func.R')
 load(paste0('/home/mayo/m216453/lu/pairwiseFDR/data/realdata/shuffle/dat/',f))
-methods_funs <- list('AdaptiveGBHo'='run_AdaptiveGBHo','AdaptiveGBHg'='run_AdaptiveGBHg',
-                     'BH'='run_BH','ST' = 'run_ST','StoreyNew1'='Storey_New_0.1',
-                     'stratBHo'='run_stratBHo','stratSTo'='run_stratSTo',
-                     'stratBHg'='run_stratBHg','stratSTg'='run_stratSTg')
+methods_funs <- list('AdaptiveGBHo'='run_AdaptiveGBHo',
+                     'AdaptiveGBHg'='run_AdaptiveGBHg',
+                     'AdaptiveGBHo_storey'='run_AdaptiveGBHo_st',
+                     'AdaptiveGBHg_storey'='run_AdaptiveGBHg_st',
+                     'BH'='run_BH',
+                     'ST'='run_ST',
+                     'stratBHo'='run_stratBHo',
+                     'stratSTo'='run_stratSTo',
+                     'stratBHg'='run_stratBHg',
+                     'stratSTg'='run_stratSTg',
+                     'StoreyNew0'='Storey_New_0',
+                     'StoreyNew05'='Storey_New_0.05',
+                     'StoreyNew1'='Storey_New_0.1',
+                     'StoreyNew2'='Storey_New_0.2',
+                     'StoreyNew4'='Storey_New_0.4',
+                     'StoreyGeo1'='Storey_Geo_0.1',
+                     'StoreyAri1'='Storey_Ari_0.1',
+                     'StoreyNew1N'='Storey_New_0.1_norm',
+                     'StoreyNew1S'='Storey_New_0.1_S',
+                     'tdgbh3F'='run_tdgbh3F',
+                     'tdgbh3T'='run_tdgbh3T',
+                     'swfdr'='run_swfdr',
+                     'CAMT'='run_CAMT',
+                     'FDRregT'='run_FDRregT',
+                     'FDRregE'='run_FDRregE',
+                     'adaptMT'='run_adaptMT')
 tryCatch({
   res <- time <- NULL
   wrapper <- match.fun(methods_funs[[m]])
@@ -529,6 +627,14 @@ tryCatch({
 ## ==== FDR plot code ======
 setwd('/research/bsi/projects/staff_analysis/m216453/pairwiseFDR/data/realdata/shuffle/res/')
 files <- list.files(pattern = 'Rdata$')
+files1 <- files[grep('P\\.adenoma',files)];files1 <- files1[-grep('AdaptiveGBHg.ZicoSeq.Rdata|AdaptiveGBHo.ZicoSeq.Rdata|stratSTg|stratBHg',files1)]
+files2 <- files[grep('P\\.combo',files)];files2 <- files2[-grep('AdaptiveGBHg.ZicoSeq.Rdata|AdaptiveGBHo.ZicoSeq.Rdata|stratSTg|stratBHg',files2)]
+files3 <- files[grep('P\\.Autism',files)];files3 <- files3[-grep('AdaptiveGBHg.ZicoSeq.Rdata|AdaptiveGBHo.Wilcox.Rdata|stratSTg|stratBHg|AdaptiveGBHg.Wilcox.Rdata',files3)]
+table(gsub('.*\\.wilcox\\_|.Wilcox.Rdata','',files3))
+table(gsub('.*\\.wilcox\\_|.Wilcox.Rdata|.ZicoSeq.Rdata|.*\\.ZicoSeq\\_','',files2))
+table(gsub('.*\\.wilcox\\_|.Wilcox.Rdata|.ZicoSeq.Rdata|.*\\.ZicoSeq\\_','',files1))
+
+files <- c(files1, files2, files3)
 ct0.01 <- ct0.05 <- ct0.1 <- ct0.15 <- ct0.2 <- c()
 for(file in files){
   out<-NULL
@@ -536,11 +642,12 @@ for(file in files){
   load(file)
   ct0.01 <- c(ct0.01,sum(out$fdr<=0.01, na.rm = T))
   ct0.05 <- c(ct0.05,sum(out$fdr<=0.05, na.rm = T))
+  # mn0.05 <- c(mn0.05,mean(out$fdr<=0.05, na.rm = T))
   ct0.1 <- c(ct0.1,sum(out$fdr<=0.1, na.rm = T))
   ct0.15 <- c(ct0.15,sum(out$fdr<=0.15, na.rm = T))
   ct0.2 <- c(ct0.2,sum(out$fdr<=0.2, na.rm = T))
 }
-names(ct0.01) <-names(ct0.05) <- names(ct0.1) <- names(ct0.15) <- names(ct0.2) <- files
+names(ct0.01) <- names(ct0.05) <- names(ct0.1) <- names(ct0.15) <- names(ct0.2) <- files
 df <- cbind(ct0.01,ct0.05,ct0.1,ct0.15,ct0.2)
 colnames(df) <- c('FDR(0.01)','FDR(0.05)','FDR(0.1)','FDR(0.15)','FDR(0.2)')
 df <- as.data.frame(df) %>% rownames_to_column('file')
@@ -551,29 +658,25 @@ df$method[df$method=='stratBHo'] <- 'stratBH_o'
 df$method[df$method=='stratBHg'] <- 'stratBH_g'
 df$method[df$method=='stratSTo'] <- 'stratST_o'
 df$method[df$method=='stratSTg'] <- 'stratST_g'
-df$method[df$method=='AdaptiveGBHo'] <- 'AdaptiveGBH_o'
-df$method[df$method=='AdaptiveGBHg'] <- 'AdaptiveGBH_g'
-# save(df, file = '/research/bsi/projects/staff_analysis/m216453/pairwiseFDR/data/realdata/adenomaZ_comboZ_autismZ(shuffle).Rdata')
+df$method[df$method=='AdaptiveGBHo_storey'] <- 'AdaptiveGBH_o'
+df$method[df$method=='AdaptiveGBHg_storey'] <- 'AdaptiveGBH_g'
+# save(df, file = '/research/bsi/projects/staff_analysis/m216453/pairwiseFDR/data/realdata/adenomaZ_comboZ_autismZ(shuffle)_rev.Rdata')
 
 
-# load('/research/bsi/projects/staff_analysis/m216453/pairwiseFDR/data/realdata/adenomaZ_comboZ_autismW(shuffle).Rdata')
+# load('/research/bsi/projects/staff_analysis/m216453/pairwiseFDR/data/realdata/adenomaZ_comboZ_autismZ(shuffle)_rev.Rdata')
 df <- melt(df)
 firstup <- function(x) {
   substr(x, 1, 1) <- toupper(substr(x, 1, 1))
   x
 }
+method.o <- c('2dGBH','BH','ST','AdaptiveGBH_g','AdaptiveGBH_o','stratST_o','stratBH_o')
 df$dataset <- firstup(df$dataset)
 df$iter <- ifelse(df$value==0,0,1)
 fdr <- aggregate(iter ~ dataset + method + variable, df, function(x) mean(x))
 mn <- aggregate(iter ~ method, fdr, function(x) mean(x))
 mn <- mn[order(mn$iter),]
 fdr <- within(fdr,  method<- factor(method, levels =mn$method))
-col <- c('2dGBH'="#EF3B2C",
-         "ST"="#C6DBEF","BH"="#6BAED6", 
-         "stratBH_o"=brewer.pal(8,'Greens')[3], "stratST_o"="#41AB5D",
-         "stratBH_g"="#238443", "stratST_g"="#F7FCB9",
-         "AdaptiveGBH_o"="#6A51A3", "AdaptiveGBH_g"="#9E9AC8")
-fdr3 <- fdr[!(fdr$method %in% c('stratST_g','stratBH_g')),]
+fdr3 <- fdr[(fdr$method %in% method.o),]
 fdr3$iter <- fdr3$iter *100
 fdr3 <- within(fdr3,  dataset<- factor(dataset, levels =c("Combo","Adenoma","Autism")))
 
@@ -593,10 +696,10 @@ p1 <- ggplot(fdr3[fdr3$variable=='FDR(0.05)' & fdr3$dataset %in% c("Autism","Ade
                      legend.position = 'none') + 
   labs(x = '',y = '% of permuted dataset with positive findings', fill ='') 
 p1
-ggsave(file='/research/bsi/projects/staff_analysis/m216453/pairwiseFDR/result/Figure4A.pdf',width = 10, height =  6)
+ggsave(file='/research/bsi/projects/staff_analysis/m216453/pairwiseFDR/result/Figure4A_rev.pdf',width = 10, height =  6)
 
 
-df3 <- df[df$variable %in% c('FDR(0.05)') & !(df$method %in% c('stratST_g','stratBH_g')),]
+df3 <- df[df$variable %in% c('FDR(0.05)') & (df$method %in% method.o),]
 df3 <- within(df3,  method<- factor(method, levels =ord))
 df3 <- within(df3,  dataset<- factor(dataset, levels =c("Combo","Adenoma","Autism")))
 combo.df <- df3[df3$dataset=="Combo",] %>% mutate(pct = value/79.18)
@@ -616,12 +719,12 @@ p21 <- ggplot(df3[df3$dataset=="Combo",], aes(x = method, y = value, fill = meth
   facet_wrap(~ dataset, scales = 'free_y') + 
   theme_bw() + 
   theme(axis.text.x = element_text(color = 'black', angle = 90, hjust = 1, vjust = 0.25, size = 14), 
-       panel.grid = element_blank(),
-       axis.text = element_text(color = 'black', size = 14),
-       axis.title = element_text(color = 'black', size = 14),
-       strip.text = element_text(color = 'black', size = 14),
-       legend.text = element_text(color = 'black', size = 14),
-       legend.position = 'none') + 
+        panel.grid = element_blank(),
+        axis.text = element_text(color = 'black', size = 14),
+        axis.title = element_text(color = 'black', size = 14),
+        strip.text = element_text(color = 'black', size = 14),
+        legend.text = element_text(color = 'black', size = 14),
+        legend.position = 'none') + 
   labs(x = '',y = '# of positive findings in permuted datasets', fill ='') 
 p22 <- ggplot(df3[df3$dataset=="Adenoma",], aes(x = method, y = value, fill = method)) + 
   geom_boxplot(outlier.size = 0.4) + 
@@ -656,6 +759,8 @@ library(ggpubr)
 p2 <- ggpubr::ggarrange(p21 , p22 , p23, # remove axis labels from plots
                         labels = NULL, ncol = 3, nrow = 1,align = "hv")
 p2
-ggsave('/research/bsi/projects/staff_analysis/m216453/pairwiseFDR/result/Figure4B.pdf',width = 10, height =  6)
+ggsave('/research/bsi/projects/staff_analysis/m216453/pairwiseFDR/result/Figure4B_rev.pdf',width = 10, height = 4)
+
+
 
 
