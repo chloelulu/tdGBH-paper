@@ -1,8 +1,8 @@
 ## === 2dGBH ====
 # Below code is a little different from github package
 # However, the default application below code is the same as github package
-# some parameters weight.method = 'new', renorm=F, shrinkage = 'old' added for comparing ari vs geo vs 2dGBH, normalization or not, shrinkage in sqrt or not, respectively
-tdGBH <- function(p.mat, pi0.method = 'storey', global.pi0.method = 'storey', weight.method = 'new', shrink = 0.1, renorm=F, shrinkage = 'old'){
+# some parameters weight.method, renorm, shrinkage added for comparing ari(ari) vs geo(geo) vs 2dGBH(new), normalization(T) or not(F), apply weighted shrinkage in linear scale("linear") or power scale ("power"), respectively
+tdGBH <- function(p.mat, pi0.method = 'storey', global.pi0.method = 'storey', weight.method = 'new', shrink = 0.1, renorm=F, shrinkage = 'linear'){
   
   pi0.method <- match.arg(pi0.method, c( 'storey','lsl','tst'))
   global.pi0.method  <- match.arg( global.pi0.method, c( 'storey','lsl','tst'))
@@ -13,12 +13,12 @@ tdGBH <- function(p.mat, pi0.method = 'storey', global.pi0.method = 'storey', we
   pi0.o <- apply(p.mat, 2, function(x) estimate.pi0(x, method = pi0.method))
   pi0.g <- apply(p.mat, 1, function(x) estimate.pi0(x, method = pi0.method))
   
-  if(shrinkage == 'old'){
+  if(shrinkage == 'linear'){
     pi0.o <- (1 - shrink) * pi0.o + shrink * pi0
     pi0.g <- (1 - shrink)  * pi0.g + shrink * pi0
   }
   
-  if(shrinkage == 'new'){
+  if(shrinkage == 'power'){
     pi0.o <-  (pi0.o^(1 - shrink)) * (pi0^shrink)
     pi0.g <- (pi0.g^(1 - shrink)) * (pi0^shrink)
   }
@@ -326,7 +326,7 @@ lsl_storey_New_0.1 <- function(dat, shrink = 0.1){
 Storey_New_0.1_S <- function(dat, shrink = 0.1){
   t1 <- Sys.time()
   fdr <- tdGBH(p.mat = dat$pValues, pi0.method = 'storey', 
-               global.pi0.method = 'storey', shrink = shrink, shrinkage = 'new')
+               global.pi0.method = 'storey', shrink = shrink, shrinkage = 'power')
   time <- difftime(Sys.time(),t1)
   return(list(fdr=as.vector(fdr), time = time))
 }

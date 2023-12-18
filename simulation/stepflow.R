@@ -21,12 +21,12 @@ colnames(p.mat) <- paste0('o', 1:ncol(p.mat))
 pdf("/Users/M216453/Documents/Mayo_Research/2022_08_04_pairwiseFDR/revision1/Figures/p.pdf", width = 4, height = 3.5)
 Heatmap(p.mat, cluster_rows = FALSE, cluster_columns = FALSE,
         col = colorRamp2(c(0, median(p.mat, na.rm = TRUE), max(p.mat, na.rm = TRUE)), 
-                         brewer.pal(9, 'Purples')[c(9,5,1)]),
+                         brewer.pal(9, 'Purples')[c(1,5,9)]),
         name = "pvalue",
         cell_fun = function(j, i, x, y, width, height, fill) {
           if(p.mat[i,j] <= 0.05) {
             grid.text('*', x = x, y = y, 
-                      gp = gpar(col = "white"), # Set the color of the asterisk to white
+                      gp = gpar(col = "black"), # Set the color of the asterisk to white
                       just = "center") # Center the asterisk in the cell
           }
         })
