@@ -1,26 +1,27 @@
 ## === 2dGBH ====
 # Below code is a little different from github package
 # However, the default application below code is the same as github package
-# some parameters weight.method, renorm, shrinkage added for comparing ari(ari) vs geo(geo) vs 2dGBH(new), normalization(T) or not(F), apply weighted shrinkage in linear scale("linear") or power scale ("power"), respectively
-tdGBH <- function(p.mat, pi0.method = 'storey', global.pi0.method = 'storey', weight.method = 'new', shrink = 0.1, renorm=F, shrinkage = 'linear'){
+# some parameters weight.method, renorm for comparing ari(ari) vs geo(geo) vs 2dGBH(new), normalization(T) or not(F), respectively
+tdGBH <- function(p.mat, pi0.method = c('storey','lsl','tst'), global.pi0.method = c('storey','lsl','tst'), weight.method = 'new', shrinkage.factor = 0.1, renorm=F, shrinkage.method = c('linear', 'power')){
   
-  pi0.method <- match.arg(pi0.method, c( 'storey','lsl','tst'))
-  global.pi0.method  <- match.arg( global.pi0.method, c( 'storey','lsl','tst'))
-  shrinkage <- match.arg( shrinkage, c('old','new'))
-  
+  pi0.method <- match.arg(pi0.method, c('storey','lsl','tst'))
+  global.pi0.method  <- match.arg(global.pi0.method, c( 'storey','lsl','tst'))
+  shrinkage.method <- match.arg(shrinkage.method, c('linear', 'power'))
+  weight.method <- match.arg(weight.method, c('new','geo', 'ari')) 
+
   pi0 <- estimate.pi0(as.vector(p.mat), method =  global.pi0.method)
   
   pi0.o <- apply(p.mat, 2, function(x) estimate.pi0(x, method = pi0.method))
   pi0.g <- apply(p.mat, 1, function(x) estimate.pi0(x, method = pi0.method))
   
-  if(shrinkage == 'linear'){
-    pi0.o <- (1 - shrink) * pi0.o + shrink * pi0
-    pi0.g <- (1 - shrink)  * pi0.g + shrink * pi0
+  if(shrinkage.method == 'linear'){
+    pi0.o <- (1 - shrinkage.factor) * pi0.o + shrinkage.factor * pi0
+    pi0.g <- (1 - shrinkage.factor)  * pi0.g + shrinkage.factor * pi0
   }
   
-  if(shrinkage == 'power'){
-    pi0.o <-  (pi0.o^(1 - shrink)) * (pi0^shrink)
-    pi0.g <- (pi0.g^(1 - shrink)) * (pi0^shrink)
+  if(shrinkage.method == 'power'){
+    pi0.o <-  (pi0.o^(1 - shrinkage.factor)) * (pi0^shrinkage.factor)
+    pi0.g <- (pi0.g^(1 - shrinkage.factor)) * (pi0^shrinkage.factor)
   }
   
   pi0.o.mat <- t(matrix(pi0.o, nrow = length(pi0.o), ncol = length(pi0.g)))
@@ -255,11 +256,10 @@ run_AdaptiveGBHg <-  function(dat){
 Storey_New_0.1 <- function(dat, shrink = 0.1){
   t1 <- Sys.time()
   fdr <- weight_BH2(p.mat = dat$pValues, pi0.method = 'storey', 
-                    global.pi0.method = 'storey', shrink = shrink)
+                    global.pi0.method = 'storey', shrinkage.factor = shrink)
   time <- difftime(Sys.time(),t1)
   return(list(fdr=as.vector(fdr$p.adj), time = time))
 }
-
 
 run_AdaptiveGBHo_st <-  function(dat){
   pvals <- dat$pvals
@@ -302,7 +302,7 @@ run_AdaptiveGBHg_st <-  function(dat){
 Storey_New_0 <- function(dat, shrink = 0){
   t1 <- Sys.time()
   fdr <- tdGBH(p.mat = dat$pValues, pi0.method = 'storey', 
-               global.pi0.method = 'storey', shrink = shrink)
+               global.pi0.method = 'storey', shrinkage.factor = shrink)
   time <- difftime(Sys.time(),t1)
   return(list(fdr=as.vector(fdr), time = time))
 }
@@ -310,7 +310,7 @@ Storey_New_0 <- function(dat, shrink = 0){
 Storey_New_0.1 <- function(dat, shrink = 0.1){
   t1 <- Sys.time()
   fdr <- tdGBH(p.mat = dat$pValues, pi0.method = 'storey', 
-               global.pi0.method = 'storey', shrink = shrink)
+               global.pi0.method = 'storey', shrinkage.factor = shrink)
   time <- difftime(Sys.time(),t1)
   return(list(fdr=as.vector(fdr), time = time))
 }
@@ -318,7 +318,7 @@ Storey_New_0.1 <- function(dat, shrink = 0.1){
 lsl_storey_New_0.1 <- function(dat, shrink = 0.1){
   t1 <- Sys.time()
   fdr <- tdGBH(p.mat = dat$pValues, pi0.method = 'storey', 
-               global.pi0.method = 'lsl', shrink = shrink)
+               global.pi0.method = 'lsl', shrinkage.factor = shrink)
   time <- difftime(Sys.time(),t1)
   return(list(fdr=as.vector(fdr), time = time))
 }
@@ -326,7 +326,7 @@ lsl_storey_New_0.1 <- function(dat, shrink = 0.1){
 Storey_New_0.1_S <- function(dat, shrink = 0.1){
   t1 <- Sys.time()
   fdr <- tdGBH(p.mat = dat$pValues, pi0.method = 'storey', 
-               global.pi0.method = 'storey', shrink = shrink, shrinkage = 'power')
+               global.pi0.method = 'storey', shrinkage.factor = shrink, shrinkage.method = 'power')
   time <- difftime(Sys.time(),t1)
   return(list(fdr=as.vector(fdr), time = time))
 }
@@ -334,7 +334,7 @@ Storey_New_0.1_S <- function(dat, shrink = 0.1){
 Storey_New_0.05 <- function(dat, shrink = 0.05){
   t1 <- Sys.time()
   fdr <- tdGBH(p.mat = dat$pValues, pi0.method = 'storey', 
-               global.pi0.method = 'storey', shrink = shrink)
+               global.pi0.method = 'storey', shrinkage.factor = shrink)
   time <- difftime(Sys.time(),t1)
   return(list(fdr=as.vector(fdr), time = time))
 }
@@ -342,39 +342,39 @@ Storey_New_0.05 <- function(dat, shrink = 0.05){
 Storey_New_0.2 <- function(dat, shrink = 0.2){
   t1 <- Sys.time()
   fdr <- tdGBH(p.mat = dat$pValues, pi0.method = 'storey', 
-               global.pi0.method = 'storey', shrink = shrink)
+               global.pi0.method = 'storey', shrinkage.factor = shrink)
   time <- difftime(Sys.time(),t1)
   return(list(fdr=as.vector(fdr), time = time))
 }
 
-Storey_New_0.4 <- function(dat, shrink = 0.4){
+Storey_New_0.4 <- function(dat, shrinkage.factor = 0.4){
   t1 <- Sys.time()
   fdr <- tdGBH(p.mat = dat$pValues, pi0.method = 'storey', 
-               global.pi0.method = 'storey', shrink = shrink)
+               global.pi0.method = 'storey', shrinkage.factor = shrink)
   time <- difftime(Sys.time(),t1)
   return(list(fdr=as.vector(fdr), time = time))
 }
 
-Storey_Geo_0.1 <- function(dat, shrink = 0.1){
+Storey_Geo_0.1 <- function(dat, shrinkage.factor = 0.1){
   t1 <- Sys.time()
   fdr <- tdGBH(p.mat = dat$pValues, pi0.method = 'storey', 
-               global.pi0.method = 'storey', weight.method = 'geo', shrink = shrink)
+               global.pi0.method = 'storey', weight.method = 'geo', shrinkage.factor = shrink)
   time <- difftime(Sys.time(),t1)
   return(list(fdr=as.vector(fdr), time = time))
 }
 
-Storey_Ari_0.1 <- function(dat, shrink = 0.1){
+Storey_Ari_0.1 <- function(dat, shrinkage.factor = 0.1){
   t1 <- Sys.time()
   fdr <- tdGBH(p.mat = dat$pValues, pi0.method = 'storey', 
-               global.pi0.method = 'storey', weight.method = 'ari', shrink = shrink)
+               global.pi0.method = 'storey', weight.method = 'ari', shrinkage.factor = shrink)
   time <- difftime(Sys.time(),t1)
   return(list(fdr=as.vector(fdr), time = time))
 }
 
-Storey_New_0.1_norm <- function(dat, shrink = 0.1){
+Storey_New_0.1_norm <- function(dat, shrinkage.factor = 0.1){
   t1 <- Sys.time()
   fdr <- tdGBH(p.mat = dat$pValues, pi0.method = 'storey', 
-               global.pi0.method = 'storey', shrink = shrink, renorm = T)
+               global.pi0.method = 'storey', shrinkage.factor = shrink, renorm = T)
   time <- difftime(Sys.time(),t1)
   return(list(fdr=as.vector(fdr), time = time))
 }
